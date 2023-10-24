@@ -3,14 +3,15 @@ import List from "./List";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import nonTokenAxiosInstance from "../../Axios/NonToken.a";
 
 const MainList = ({ url, page, setTotalPage }) => {
   const [data, setData] = useState([]);
   const { category } = useParams();
   const funcGetProductByCategory = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:20474/product/api/getProductByCategory${url}`,
+      const res = await nonTokenAxiosInstance.get(
+        `/product/api/getProductByCategory${url}`,
         {
           params: { category, page },
         }
