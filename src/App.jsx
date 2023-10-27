@@ -37,6 +37,7 @@ import Success from "./Pages/Success";
 import Failure from "./Pages/Failure";
 import Order from "./Pages/Order";
 import Footer from "./Components/Layouts/Footer";
+import SuccessPayByCard from "./Pages/SuccessPayByCard";
 
 function App() {
   return (
@@ -137,6 +138,10 @@ function App() {
             <Route
               path="/checkout/canceled"
               element={<Failure></Failure>}
+            ></Route>
+            <Route
+              path="/pay-success"
+              element={<SuccessPayByCard></SuccessPayByCard>}
             ></Route>
           </Route>
           <Route

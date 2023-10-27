@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import List from "./List";
 import PropTypes from "prop-types";
-import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import nonTokenAxiosInstance from "../../Axios/NonToken.a";
 

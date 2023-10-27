@@ -1,19 +1,20 @@
-import axios from "axios";
 import Banner from "../Components/Banner/Banner";
 import SwiperCard from "../Components/Card/SwiperCard";
 import CategoryList from "../Components/Category/CategoryList";
 import { useEffect, useState } from "react";
+import nonTokenAxiosInstance from "../Axios/NonToken.a";
 
 const Home = () => {
   const [popularProduct, setPopularProduct] = useState([]);
   const [newProduct, setNewProduct] = useState([]);
   const LoadPopularProduct = async () => {
-    const url =
-      "https://shop-demo1.onrender.com/product/api/getPopularProducts";
     try {
-      const res = await axios.get(url, {
-        params: { limit: 10 },
-      });
+      const res = await nonTokenAxiosInstance.get(
+        "/product/api/getPopularProducts",
+        {
+          params: { limit: 10 },
+        }
+      );
       if (res.data) {
         setPopularProduct(res.data.data);
       }
@@ -23,11 +24,13 @@ const Home = () => {
   };
 
   const LoadNewProduct = async () => {
-    const url = "https://shop-demo1.onrender.com/product/api/getNewProducts";
     try {
-      const res = await axios.get(url, {
-        params: { limit: 10 },
-      });
+      const res = await nonTokenAxiosInstance.get(
+        "/product/api/getNewProducts",
+        {
+          params: { limit: 10 },
+        }
+      );
       if (res.data) {
         console.log(res.data.data);
         setNewProduct(res.data.data);

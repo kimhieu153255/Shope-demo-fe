@@ -27,6 +27,8 @@ const Pay = () => {
   const totalCost = BuyList.reduce((acc, item) => {
     return acc + item.price * item.quantity;
   }, 0);
+  console.log(BuyList);
+  console.log(totalCost);
 
   const funcGetAddresses = async () => {
     const res = await tokenAxiosInstance.get(
@@ -59,7 +61,7 @@ const Pay = () => {
         return {
           productId: item.id,
           quantity: item.quantity,
-          imgSrc: item.imgSrc,
+          imgSrc: item.imgSrc || "http://localhost:4000/avatar.avif",
           name: item.name,
           color: item.color,
           size: item.size,
@@ -68,6 +70,7 @@ const Pay = () => {
       }),
       totalPrice: totalCost + costDelivery,
       addressUserId: choosenAddress._id,
+      type: localStorage.getItem("Type") || "normal",
     };
     localStorage.setItem("Order", JSON.stringify(data));
 
@@ -76,7 +79,9 @@ const Pay = () => {
         const res = await tokenAxiosInstance.post("/api/order/add", data);
         console.log(res.data);
         if (res.data) {
-          window.location.href = "/order/success";
+          localStorage.removeItem("BuyList");
+          localStorage.removeItem("Type");
+          window.location.href = "/pay-success";
         }
       } else if (method === "payment by card") {
         const res = await tokenAxiosInstance.post(
@@ -92,6 +97,8 @@ const Pay = () => {
       }
     } catch (err) {
       console.log(err);
+      localStorage.removeItem("BuyList");
+      localStorage.removeItem("Type");
       window.location.href = "/order/canceled";
     }
   };
@@ -247,10 +254,10 @@ const Pay = () => {
                 </div>
               </span>
               <div className="w-2/5 flex text-center ">
-                <span className="w-full">₫{item.price}</span>
-                <span className="w-full">{item.quantity}</span>
+                <span className="w-full">₫{item.price?.toString()}</span>
+                <span className="w-full">{item.quantity?.toString()}</span>
                 <span className="w-full text-right">
-                  {item.price * item.quantity}
+                  {(item.price * item.quantity)?.toString()}
                 </span>
               </div>
             </div>
@@ -329,16 +336,20 @@ const Pay = () => {
         <div className="w-96 ml-auto py-5">
           <div className="flex justify-between items-center mt-5">
             <span className="text-xl font-semibold">Total cost of goods:</span>
-            <span className="text-xl font-semibold">{totalCost}</span>
+            <span className="text-xl font-semibold">
+              {totalCost?.toString()}
+            </span>
           </div>
           <div className="flex justify-between items-center mt-5">
             <span className="text-xl font-semibold">Transport fee:</span>
-            <span className="text-xl font-semibold">{costDelivery}</span>
+            <span className="text-xl font-semibold">
+              {costDelivery?.toString()}
+            </span>
           </div>
           <div className="flex justify-between items-center mt-5">
             <span className="text-xl font-semibold">Total cost:</span>
             <span className="text-2xl font-semibold text-green-500">
-              VND {totalCost + costDelivery}
+              VND {(totalCost + costDelivery)?.toString()}
             </span>
           </div>
         </div>

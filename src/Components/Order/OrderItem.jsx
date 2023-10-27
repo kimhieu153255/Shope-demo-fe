@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 
-const OrderItem = ({ item }) => {
-  console.log(item);
+const OrderItem = ({ item, DeleteOrderFunc }) => {
   return (
     <div className="box bg-gray-100 border rounded-md p-5 mb-2">
       <div className="topTitle flex justify-between pb-5 pl-2 pr-2 border-b-2">
@@ -52,11 +51,21 @@ const OrderItem = ({ item }) => {
           item?.state === "pending" ? "justify-between" : "justify-end"
         } pt-10 pb-5 gap-5 pr-2 text-lg`}
       >
-        {item?.state === "pending" && (
-          <button className="border border-green-500 rounded-md px-2 hover:bg-green-500 hover:border-green-600 font-semibold">
-            Refund
+        <div>
+          {item?.state === "pending" && (
+            <button className="border border-green-500 text-white bg-green-500 rounded-md px-2 hover:bg-green-600 hover:border-green-600 font-semibold mr-3">
+              Refund
+            </button>
+          )}
+          <button
+            className="border border-red-500 bg-red-500 text-white rounded-md px-2 hover:bg-red-600 hover:border-red-600 font-semibold"
+            onClick={() => {
+              DeleteOrderFunc(item._id);
+            }}
+          >
+            delete
           </button>
-        )}
+        </div>
         <div className="flex items-center gap-3">
           <div className="font-semibold">Total:</div>
           <div className="font-semibold text-green-500">
@@ -70,6 +79,7 @@ const OrderItem = ({ item }) => {
 
 OrderItem.propTypes = {
   item: PropTypes.object,
+  DeleteOrderFunc: PropTypes.func,
 };
 
 export default OrderItem;

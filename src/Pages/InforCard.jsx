@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { FaCartPlus, FaChevronRight, FaMinus, FaPlus } from "react-icons/fa";
 import Rating from "../Components/Card/Rating";
@@ -7,6 +6,8 @@ import Cookies from "js-cookie";
 import { setCartItems } from "../redux-toolkit/CartSlice";
 import { useDispatch } from "react-redux";
 import { addMessage, removeMessage } from "../redux-toolkit/MessageSlice";
+import nonTokenAxiosInstance from "../Axios/NonToken.a";
+import tokenAxiosInstance from "../Axios/Token.a";
 
 const quantityOfInforProduct = (inforProducts, color, size) => {
   const inforProduct = inforProducts.find(
@@ -34,8 +35,8 @@ const InforCard = () => {
 
   const getColorBySize = async (size) => {
     try {
-      const res = await axios.get(
-        `https://shop-demo1.onrender.com/product/api/getColorBySize?id=${proId}&size=${size}`
+      const res = await nonTokenAxiosInstance.get(
+        `/product/api/getColorBySize?id=${proId}&size=${size}`
       );
       if (res.data) {
         console.log(res.data.data);
@@ -48,8 +49,8 @@ const InforCard = () => {
 
   const getSizeByColor = async (color) => {
     try {
-      const res = await axios.get(
-        `https://shop-demo1.onrender.com/product/api/getSizeByColor?id=${proId}&color=${color}`
+      const res = await nonTokenAxiosInstance.get(
+        `/product/api/getSizeByColor?id=${proId}&color=${color}`
       );
       if (res.data) {
         console.log(res.data.data);
@@ -69,31 +70,23 @@ const InforCard = () => {
     }
   };
 
-  const url = `https://shop-demo1.onrender.com/cart/api/get`;
   const loadData = async (user, token) => {
     if (!user || !token) return;
-    const res = await axios.get(url, {
+    const res = await tokenAxiosInstance.get("/cart/api/get", {
       params: { userId: user._id },
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     dispatch(setCartItems(res.data?.ListCart || []));
   };
 
   const addProductToCart = async (name) => {
     try {
-      const res = await axios.post(
-        `https://shop-demo1.onrender.com/cart/api/addDetail`,
-        {
-          userId: JSON.parse(Cookies.get("user")?.toString() || null)._id,
-          productId: proId,
-          quantity: quantity,
-          color: colorChosen,
-          size: sizeChosen,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("token")}` } }
-      );
+      const res = await tokenAxiosInstance.post(`/cart/api/addDetail`, {
+        userId: JSON.parse(Cookies.get("user")?.toString() || null)._id,
+        productId: proId,
+        quantity: quantity,
+        color: colorChosen,
+        size: sizeChosen,
+      });
       if (res.data) {
         console.log(res.data.data);
         setAvailable(available - quantity);
@@ -114,8 +107,8 @@ const InforCard = () => {
   useEffect(() => {
     const getProduct = async () => {
       try {
-        const res = await axios.get(
-          `https://shop-demo1.onrender.com/product/api/getProductById?productId=${proId}`
+        const res = await nonTokenAxiosInstance.get(
+          `/product/api/getProductById?productId=${proId}`
         );
         if (res.data) {
           console.log(res.data.data);
@@ -368,11 +361,13 @@ const InforCard = () => {
             <button
               className="bg-green-500 border border-green-600 text-white font-semibold py-2 px-5 rounded-md hover:bg-green-600 text-xl"
               onClick={() => {
+                console.log(product.inforProducts);
                 const temp = product?.inforProducts.find((item) => {
                   if (item.color === colorChosen && item.size === sizeChosen) {
-                    return item.imgSrc;
+                    return item;
                   }
                 });
+                console.log(temp);
                 const buylist = [
                   {
                     id: product?.product?._id,
@@ -381,11 +376,13 @@ const InforCard = () => {
                     quantity: quantity,
                     price: temp?.price,
                     name: product?.product?.name,
-                    imgSrc: temp?.imgSrc,
+                    imgSrc: temp?.imgSrc || "http://locahost:4000/avatar.avif",
                   },
                 ];
                 console.log(buylist);
+                console.log(colorChosen, sizeChosen);
                 localStorage.setItem("BuyList", JSON.stringify(buylist));
+                localStorage.setItem("Type", "Buy-now");
                 window.location.href = "/pay";
               }}
             >

@@ -2,9 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import OrderItem from "../Components/Order/OrderItem";
 import Cookies from "js-cookie";
 import tokenAxiosInstance from "../Axios/Token.a";
+import { addMessage, removeMessage } from "../redux-toolkit/MessageSlice";
+import { useDispatch } from "react-redux";
 
 const Order = () => {
   const [orders, setOrders] = useState([]);
+  const dispatch = useDispatch();
 
   const getOrders = async () => {
     try {
@@ -14,6 +17,23 @@ const Order = () => {
       );
       console.log(res.data);
       if (res.data.data) setOrders(res.data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const DeleteOrderFunc = async (orderId) => {
+    try {
+      const response = await tokenAxiosInstance.delete(
+        `/api/order/deleteOrder?orderId=${orderId}`
+      );
+      if (response.data) {
+        await getOrders();
+        dispatch(addMessage("Delete order successfully"));
+        setTimeout(() => {
+          dispatch(removeMessage());
+        }, 3000);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -36,7 +56,7 @@ const Order = () => {
         </div>
       )}
       {orders.map((item, index) => (
-        <OrderItem item={item} key={index} />
+        <OrderItem item={item} key={index} DeleteOrderFunc={DeleteOrderFunc} />
       ))}
     </div>
   );
